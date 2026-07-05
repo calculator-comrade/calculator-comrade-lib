@@ -17,6 +17,10 @@ void Calculator::setDisplayEventCallback(DisplayEventCallback const callback) {
 }
 
 void Calculator::input(Button button) {
+    if (button == Button::memRC) {
+        button = lastButton_ == Button::memR || lastButton_ == Button::memC ? Button::memC : Button::memR;
+    }
+
     if (x_.hasError()) {
         switch (button) {
             case Button::ca:
@@ -58,7 +62,8 @@ void Calculator::input(Button button) {
         case Button::memR:
         case Button::memRC:
         case Button::sqrt:
-            if (lastButton_ != Button::memRC) isNumberOrPoint = true;
+            // if (lastButton_ != Button::memRC) isNumberOrPoint = true;
+            isNumberOrPoint = true;
             break;
         default:
             isNumberOrPoint = false;
@@ -247,6 +252,8 @@ void Calculator::saveButton(const Button button) {
     lastButtonWasCe_ = false;
     switch (button) {
         case Button::ceca:
+        case Button::memR:
+        case Button::memC:
         case Button::memRC:
         case Button::plus:
         case Button::minus:

@@ -32,7 +32,6 @@ TEST_MEM(Plus) {
 //mr => mem 2
 //mc => 2
 //mc => 2
-//TODO DZZ Check it on hardware.
 TEST_MEM(MemClear) {
     Calculator c;
     Register &x = c.getX();
@@ -591,4 +590,72 @@ TEST_MEM(MulMemRestore) {
     ASSERT_EQ(18, getIntValue(x));
     ASSERT_EQ(3, getIntValue(y));
     ASSERT_EQ(2, getIntValue(m));
+}
+
+//12 m+ => X=12, mem=12
+//3 m+ => X=3, mem=15
+//mr => X=15, mem=15
+//4 => X=4, mem=15
+TEST_MEM(DisplayClearAfterMR) {
+    Calculator c;
+    Register &x = c.getX();
+    Register &m = c.getM();
+
+    ASSERT_FALSE(c.memHasValue());
+    c.input(Button::d1);
+    c.input(Button::d2);
+    c.input(Button::memPlus);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(12, getIntValue(x));
+    ASSERT_EQ(12, getIntValue(m));
+
+    c.input(Button::d3);
+    c.input(Button::memPlus);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(3, getIntValue(x));
+    ASSERT_EQ(15, getIntValue(m));
+
+    c.input(Button::memR);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(15, getIntValue(x));
+    ASSERT_EQ(15, getIntValue(m));
+
+    c.input(Button::d4);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(4, getIntValue(x));
+    ASSERT_EQ(15, getIntValue(m));
+}
+
+//12 m+ => X=12, mem=12
+//3 m+ => X=3, mem=15
+//mrc => X=15, mem=15
+//4 => X=4, mem=15
+TEST_MEM(DisplayClearAfterMRC) {
+    Calculator c;
+    Register &x = c.getX();
+    Register &m = c.getM();
+
+    ASSERT_FALSE(c.memHasValue());
+    c.input(Button::d1);
+    c.input(Button::d2);
+    c.input(Button::memPlus);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(12, getIntValue(x));
+    ASSERT_EQ(12, getIntValue(m));
+
+    c.input(Button::d3);
+    c.input(Button::memPlus);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(3, getIntValue(x));
+    ASSERT_EQ(15, getIntValue(m));
+
+    c.input(Button::memRC);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(15, getIntValue(x));
+    ASSERT_EQ(15, getIntValue(m));
+
+    c.input(Button::d4);
+    ASSERT_TRUE(c.memHasValue());
+    ASSERT_EQ(4, getIntValue(x));
+    ASSERT_EQ(15, getIntValue(m));
 }
