@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 (2026-07-19)
+
+* Added option `CALC_OPTION_OVERFLOW_ON_INT_INPUT`.
+* Fixed input after MRC button. 
+
 ## 1.0.0 (2026-05-17)
 
 * Added modern CMake presets for supported build targets.

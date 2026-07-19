@@ -27,7 +27,6 @@ namespace calculatorcomrade {
                 m_(size),
                 operation_(Operation::add),
                 lastButton_(Button::none),
-                lastButtonWasCe_(false),
                 hasOperation_(false),
                 inNumber_(false),
                 displayEventCallback_(nullptr),
@@ -71,7 +70,6 @@ namespace calculatorcomrade {
         Register m_;
         Operation operation_;
         Button lastButton_;
-        bool lastButtonWasCe_;
         bool hasOperation_;
         bool inNumber_;
         DisplayEventCallback displayEventCallback_;

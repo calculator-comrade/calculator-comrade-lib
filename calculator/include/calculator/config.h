@@ -23,6 +23,7 @@ namespace calculatorcomrade {
 
         static constexpr CalcOptions OPTION_TRUNC_ZEROS_ON_OVERFLOW = CALC_OPTION_TRUNC_ZEROS_ON_OVERFLOW;
         static constexpr CalcOptions OPTION_MEMORY_OVERFLOW_CLEARS_X = CALC_OPTION_MEMORY_OVERFLOW_CLEARS_X;
+        static constexpr CalcOptions OPTION_OVERFLOW_ON_INT_INPUT = CALC_OPTION_OVERFLOW_ON_INT_INPUT;
         static constexpr CalcOptions OPTIONS_DEFAULT = CALC_OPTIONS_DEFAULT;
     };
 }

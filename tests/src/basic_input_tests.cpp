@@ -22,12 +22,14 @@ TEST_CALCULATOR_INPUT(ClearEntry1) {
     ASSERT_EQ(defaultRegister, calc.getM());
     ASSERT_EQ(Operation::add, calc.getOperation());
     calc.input(Button::d1);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
     ASSERT_NE(defaultRegister, calc.getX());
     ASSERT_EQ(defaultRegister, calc.getY());
     ASSERT_EQ(defaultRegister, calc.getM());
     ASSERT_EQ(Operation::add, calc.getOperation());
     calc.input(Button::ce);
-    ASSERT_EQ(defaultRegister, calc.getX());
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    ASSERT_NE(defaultRegister, calc.getX());
     ASSERT_EQ(defaultRegister, calc.getY());
     ASSERT_EQ(defaultRegister, calc.getM());
     ASSERT_EQ(Operation::add, calc.getOperation());
@@ -106,6 +108,62 @@ TEST_CALCULATOR_INPUT(ClearAll) {
     ASSERT_FALSE(x.hasOverflow());
 }
 
+TEST_CALCULATOR_INPUT(OverflowOnIntInputDisabledByDefault) {
+    CalcOptions co = Config::OPTIONS_DEFAULT & Config::OPTION_OVERFLOW_ON_INT_INPUT;
+    ASSERT_NE(0, Config::OPTION_OVERFLOW_ON_INT_INPUT);
+    ASSERT_EQ(0, co);
+}
+
+TEST_CALCULATOR_INPUT(OverflowOnIntInputDisabled) {
+    Calculator c(8, Config::OPTIONS_DEFAULT);
+    Register &x = c.getX();
+    for (int8_t i = 0; i < 8; i++)
+        c.input(Button::d9);
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+    c.input(Button::d9);
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+}
+
+TEST_CALCULATOR_INPUT(OverflowOnFloatInputDisabled) {
+    Calculator c(8, Config::OPTIONS_DEFAULT);
+    Register &x = c.getX();
+    for (int8_t i = 0; i < 8; i++)
+        c.input(Button::d9);
+    c.input(Button::point);
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+    c.input(Button::d9);
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+}
+
+TEST_CALCULATOR_INPUT(OverflowOnIntInputEnabled) {
+    Calculator c(8, Config::OPTIONS_DEFAULT | Config::OPTION_OVERFLOW_ON_INT_INPUT);
+    Register &x = c.getX();
+    for (int8_t i = 0; i < 8; i++)
+        c.input(Button::d9);
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+    c.input(Button::d9);
+    ASSERT_TRUE(x.hasError());
+    ASSERT_TRUE(x.hasOverflow());
+}
+
+TEST_CALCULATOR_INPUT(OverflowOnFloatInputEnabled) {
+    Calculator c(8, Config::OPTIONS_DEFAULT | Config::OPTION_OVERFLOW_ON_INT_INPUT);
+    Register &x = c.getX();
+    for (int8_t i = 0; i < 8; i++)
+        c.input(Button::d9);
+    c.input(Button::point);
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+    c.input(Button::d9); // OPTION_OVERFLOW_ON_INT_INPUT flag doesn't work for float numbers
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+}
+
 TEST_CALCULATOR_INPUT(CeAfterOverflow) {
     Calculator c(8);
     Register &x = c.getX();
@@ -135,6 +193,32 @@ TEST_CALCULATOR_INPUT(CeAfterOverflow) {
     ASSERT_EQ(89999999, getIntValue(x)); // 8.9999999 in X
     ASSERT_EQ(7, x.getPointPos());
     ASSERT_EQ(99999999, getIntValue(y)); // 99999999 in Y
+    ASSERT_EQ(0, y.getPointPos());
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+}
+
+TEST_CALCULATOR_INPUT(CaAfterOverflow) {
+    Calculator c(8);
+    Register &x = c.getX();
+    Register &y = c.getY();
+
+    for (int8_t i = 0; i < 8; i++)
+        c.input(Button::d9);
+    c.input(Button::mul);
+    c.input(Button::d9);
+    c.input(Button::equals);
+    ASSERT_EQ(89999999, getIntValue(x)); // 8.9999999 in X
+    ASSERT_EQ(7, x.getPointPos());
+    ASSERT_EQ(99999999, getIntValue(y)); // 99999999 in Y
+    ASSERT_EQ(0, y.getPointPos());
+    ASSERT_TRUE(x.hasError());
+    ASSERT_TRUE(x.hasOverflow());
+
+    c.input(Button::ca);
+    ASSERT_EQ(0, getIntValue(x)); // 0 in X
+    ASSERT_EQ(0, x.getPointPos());
+    ASSERT_EQ(0, getIntValue(y)); // 0 in Y
     ASSERT_EQ(0, y.getPointPos());
     ASSERT_FALSE(x.hasError());
     ASSERT_FALSE(x.hasOverflow());
@@ -194,6 +278,29 @@ TEST_CALCULATOR_INPUT(CeAfterError) {
     ASSERT_FALSE(x.hasOverflow());
 
     c.input(Button::ce);
+    ASSERT_EQ(0, getIntValue(x));
+    ASSERT_EQ(0, x.getPointPos());
+    ASSERT_TRUE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+
+    c.input(Button::ca);
+    ASSERT_EQ(0, getAbsIntValue(x));
+    ASSERT_EQ(0, x.getPointPos());
+    ASSERT_EQ(0, getAbsIntValue(y));
+    ASSERT_EQ(0, y.getPointPos());
+    ASSERT_FALSE(x.hasError());
+    ASSERT_FALSE(x.hasOverflow());
+}
+
+TEST_CALCULATOR_INPUT(CaAfterError) {
+    Calculator c(8);
+    Register &x = c.getX();
+    Register &y = c.getY();
+
+    c.input(Button::d9);
+    c.input(Button::div);
+    c.input(Button::d0);
+    c.input(Button::equals);
     ASSERT_EQ(0, getIntValue(x));
     ASSERT_EQ(0, x.getPointPos());
     ASSERT_TRUE(x.hasError());

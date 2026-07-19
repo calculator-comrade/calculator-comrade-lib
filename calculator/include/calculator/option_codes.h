@@ -58,6 +58,15 @@ enum {
     CALC_OPTION_MEMORY_OVERFLOW_CLEARS_X = 0x02,
 
     /**
+     * Enables overflow error when entering an integer value that exceeds
+     * the number of digits in the X register.
+     *
+     * This option is disabled by default. For example, CASIO HS-8VA has this
+     * option disabled, while CASIO DH-12 has it enabled.
+     */
+    CALC_OPTION_OVERFLOW_ON_INT_INPUT = 0x04,
+
+    /**
      * Default calculator options.
      *
      * By default, memory register overflow clears the X register, while

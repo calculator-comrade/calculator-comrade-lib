@@ -17,6 +17,12 @@ void Calculator::setDisplayEventCallback(DisplayEventCallback const callback) {
 }
 
 void Calculator::input(Button button) {
+    if (button == Button::ceca) {
+        button = (inNumber_ || x_.hasOverflow()) && lastButton_ != Button::ce
+            ? Button::ce
+            : Button::ca;
+    }
+
     if (button == Button::memRC) {
         button = lastButton_ == Button::memR || lastButton_ == Button::memC ? Button::memC : Button::memR;
     }
@@ -29,12 +35,6 @@ void Calculator::input(Button button) {
             case Button::ce:
                 if (x_.hasOverflow())
                     x_.setError(false, false);
-                break;
-            case Button::ceca:
-                if (x_.hasOverflow())
-                    x_.setError(false, false);
-                else
-                    clearAll();
                 break;
             default:
                 break;
@@ -60,9 +60,7 @@ void Calculator::input(Button button) {
         case Button::d9:
         case Button::point:
         case Button::memR:
-        case Button::memRC:
         case Button::sqrt:
-            // if (lastButton_ != Button::memRC) isNumberOrPoint = true;
             isNumberOrPoint = true;
             break;
         default:
@@ -87,10 +85,8 @@ void Calculator::input(Button button) {
             }
             // No break! In case of a number after Sqrt operation.
         case Button::memR:
-        case Button::memRC:
         case Button::sqrt:
         case Button::ce:
-        case Button::ceca:
             // First digit or point after operation:
             if (isNumberOrPoint && !inNumber_) {
                 if (hasOperation_) {
@@ -118,11 +114,7 @@ void Calculator::input(Button button) {
             clearAll();
             break;
         case Button::ce:
-            clearEntry();
-            break;
-        case Button::ceca:
-            if (!(hasOperation_ && inNumber_) || button == lastButton_ || lastButtonWasCe_) clearAll();
-            else clearEntry();
+            if (hasOperation_ && inNumber_) clearEntry();
             break;
         case Button::d0:
         case Button::d1:
@@ -189,15 +181,13 @@ void Calculator::input(Button button) {
         case Button::memMinus:
             memPlusOrMinus(Operation::sub);
             break;
-        case Button::memRC:
-            if (button == lastButton_) memClear();
-            else memRestore();
-            break;
         case Button::memR:
             memRestore();
             break;
         case Button::memC:
             memClear();
+            break;
+        default:
             break;
     }
 
@@ -227,7 +217,13 @@ void Calculator::clearInput() {
 
 void Calculator::inputDigit(const CalcDigit digit) {
     if (digit == 0 && !inputHasPoint_ && inputSize_ == 0) return;
-    if (inputSize_ >= size_ || x_.getPointPos() == size_ - 1) return;
+    if (x_.getPointPos() == size_ - 1) return;
+    if (inputSize_ >= size_) {
+        if (!inputHasPoint_ && (options_ & Config::OPTION_OVERFLOW_ON_INT_INPUT) != 0x00) {
+            x_.setError(true, true);
+        }
+        return;
+    }
     shiftLeftOnInput();
     x_.setDigit(0, digit);
     inputSize_++;
@@ -235,7 +231,6 @@ void Calculator::inputDigit(const CalcDigit digit) {
 }
 
 void Calculator::inputPoint() {
-    if (inputSize_ >= size_) return;
     inputHasPoint_ = true;
 }
 
@@ -249,8 +244,10 @@ void Calculator::shiftLeftOnInput() {
 }
 
 void Calculator::saveButton(const Button button) {
-    lastButtonWasCe_ = false;
     switch (button) {
+        case Button::ce:
+            if (hasOperation_ && !inNumber_) break;
+        case Button::ca:
         case Button::ceca:
         case Button::memR:
         case Button::memC:
@@ -262,10 +259,6 @@ void Calculator::saveButton(const Button button) {
         case Button::mu:
         case Button::sqrt:
             lastButton_ = button;
-            break;
-        case Button::ce:
-            // This is a patch for test ClearEntry4: "3 * ce =" => 9
-            lastButtonWasCe_ = true;
             break;
         default:
             lastButton_ = Button::none;
@@ -399,6 +392,7 @@ void Calculator::memRestore()
 
 uint8_t Calculator::exportDump(uint8_t *dump) {
     CalcInt index = 0;
+    constexpr uint8_t reserved = 0;
 
     // Header:
     writeToDump(dump, index++, Config::DUMP_VERSION); // dump version
@@ -413,7 +407,7 @@ uint8_t Calculator::exportDump(uint8_t *dump) {
     writeToDump(dump, index++, inputSize_);
     writeToDump(dump, index++, inputHasPoint_ ? 1 : 0);
     writeToDump(dump, index++, static_cast<uint8_t>(lastButton_));
-    writeToDump(dump, index++, lastButtonWasCe_ ? 1 : 0);
+    writeToDump(dump, index++, reserved);
 
     // Register X:
     for (CalcInt i = 0; i < size_; i++) {
@@ -459,7 +453,7 @@ uint8_t Calculator::importDump(const uint8_t *dump, const uint8_t dumpSize) {
     inputSize_ = dump[index++];
     inputHasPoint_ = dump[index++] == 1;
     lastButton_ = static_cast<Button>(dump[index++]);
-    lastButtonWasCe_ = dump[index++] == 1;
+    index++; // Reserved byte
 
     // Register X:
     for (CalcInt i = 0; i < size_; i++) {

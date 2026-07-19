@@ -11,7 +11,6 @@
 using calculatorcomrade::Button;
 using calculatorcomrade::Calculator;
 using calculatorcomrade::Config;
-//using namespace calculatorcomrade;
 
 #define TEST_DUMP(test_name) TEST(TestDump, test_name)
 
@@ -26,7 +25,7 @@ using calculatorcomrade::Config;
 // 7    inputSize_
 // 8    inputHasPoint_
 // 9    lastButton_
-// 10   lastButtonWasCe_
+// 10   reserved
 //
 //  Register X
 // 11   data[0]
