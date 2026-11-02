@@ -14,28 +14,34 @@ using namespace calculatorcomrade;
 
 #define TEST_CALCULATOR_INPUT(test_name) TEST(BasicInput, test_name)
 
-TEST_CALCULATOR_INPUT(ClearEntry1) {
+TEST_CALCULATOR_INPUT(StartingState) {
     Calculator calc(Config::DEFAULT_SIZE);
     Register defaultRegister(Config::DEFAULT_SIZE);
     ASSERT_EQ(defaultRegister, calc.getX());
     ASSERT_EQ(defaultRegister, calc.getY());
     ASSERT_EQ(defaultRegister, calc.getM());
     ASSERT_EQ(Operation::add, calc.getOperation());
-    calc.input(Button::d1);
-    ASSERT_EQ(1, getIntValue(calc.getX()));
-    ASSERT_NE(defaultRegister, calc.getX());
-    ASSERT_EQ(defaultRegister, calc.getY());
-    ASSERT_EQ(defaultRegister, calc.getM());
-    ASSERT_EQ(Operation::add, calc.getOperation());
-    calc.input(Button::ce);
-    ASSERT_EQ(1, getIntValue(calc.getX()));
-    ASSERT_NE(defaultRegister, calc.getX());
-    ASSERT_EQ(defaultRegister, calc.getY());
-    ASSERT_EQ(defaultRegister, calc.getM());
-    ASSERT_EQ(Operation::add, calc.getOperation());
 }
 
-TEST_CALCULATOR_INPUT(ClearEntry2) {
+TEST_CALCULATOR_INPUT(Ce1) {
+    Calculator calc(Config::DEFAULT_SIZE);
+    Register defaultRegister(Config::DEFAULT_SIZE);
+    calc.input(Button::d1);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    calc.input(Button::ce);
+    ASSERT_EQ(defaultRegister, calc.getX());
+}
+
+TEST_CALCULATOR_INPUT(Ce2) {
+    Calculator calc(Config::DEFAULT_SIZE);
+    calc.input(Button::d1);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    calc.input(Button::plus);
+    calc.input(Button::ce);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+}
+
+TEST_CALCULATOR_INPUT(Ce3) {
     Calculator calc;
     Register &x = calc.getX();
 
@@ -50,7 +56,7 @@ TEST_CALCULATOR_INPUT(ClearEntry2) {
     ASSERT_EQ(4, getIntValue(x));
 }
 
-TEST_CALCULATOR_INPUT(ClearEntry3) {
+TEST_CALCULATOR_INPUT(Ce4) {
     Calculator c;
     Register &x = c.getX();
     Register &y = c.getY();
@@ -66,7 +72,7 @@ TEST_CALCULATOR_INPUT(ClearEntry3) {
     ASSERT_EQ(2, getIntValue(y));
 }
 
-TEST_CALCULATOR_INPUT(ClearEntry4) {
+TEST_CALCULATOR_INPUT(Ce5) {
     Calculator c;
     Register &x = c.getX();
     Register &y = c.getY();
@@ -79,7 +85,26 @@ TEST_CALCULATOR_INPUT(ClearEntry4) {
     ASSERT_EQ(3, getIntValue(y));
 }
 
-TEST_CALCULATOR_INPUT(ClearAll) {
+TEST_CALCULATOR_INPUT(Ca1) {
+    Calculator calc(Config::DEFAULT_SIZE);
+    Register defaultRegister(Config::DEFAULT_SIZE);
+    calc.input(Button::d1);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    calc.input(Button::ca);
+    ASSERT_EQ(defaultRegister, calc.getX());
+}
+
+TEST_CALCULATOR_INPUT(Ca2) {
+    Calculator calc(Config::DEFAULT_SIZE);
+    Register defaultRegister(Config::DEFAULT_SIZE);
+    calc.input(Button::d1);
+    calc.input(Button::plus);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    calc.input(Button::ca);
+    ASSERT_EQ(defaultRegister, calc.getX());
+}
+
+TEST_CALCULATOR_INPUT(Ca3) {
     Calculator c(8);
     Register &x = c.getX();
     Register &y = c.getY();
@@ -106,6 +131,25 @@ TEST_CALCULATOR_INPUT(ClearAll) {
     ASSERT_FALSE(x.isNegative());
     ASSERT_FALSE(x.hasError());
     ASSERT_FALSE(x.hasOverflow());
+}
+
+TEST_CALCULATOR_INPUT(CeCa1) {
+    Calculator calc(Config::DEFAULT_SIZE);
+    Register defaultRegister(Config::DEFAULT_SIZE);
+    calc.input(Button::d1);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    calc.input(Button::ceca);
+    ASSERT_EQ(defaultRegister, calc.getX());
+}
+
+TEST_CALCULATOR_INPUT(CeCa2) {
+    Calculator calc(Config::DEFAULT_SIZE);
+    Register defaultRegister(Config::DEFAULT_SIZE);
+    calc.input(Button::d1);
+    calc.input(Button::plus);
+    ASSERT_EQ(1, getIntValue(calc.getX()));
+    calc.input(Button::ceca);
+    ASSERT_EQ(defaultRegister, calc.getX());
 }
 
 TEST_CALCULATOR_INPUT(OverflowOnIntInputDisabledByDefault) {

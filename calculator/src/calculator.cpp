@@ -17,14 +17,18 @@ void Calculator::setDisplayEventCallback(DisplayEventCallback const callback) {
 }
 
 void Calculator::input(Button button) {
+    if (button == Button::memRC) {
+        button = lastButton_ == Button::memR || lastButton_ == Button::memC ? Button::memC : Button::memR;
+    }
+
     if (button == Button::ceca) {
         button = (inNumber_ || x_.hasOverflow()) && lastButton_ != Button::ce
             ? Button::ce
             : Button::ca;
     }
 
-    if (button == Button::memRC) {
-        button = lastButton_ == Button::memR || lastButton_ == Button::memC ? Button::memC : Button::memR;
+    if (button == Button::ce && inNumber_ && !x_.hasError() && !hasOperation_) {
+        button = Button::ca;
     }
 
     if (x_.hasError()) {

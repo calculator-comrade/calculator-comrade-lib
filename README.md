@@ -1,12 +1,12 @@
 # Calculator Comrade Library
 
-![Calculator Comrade Library](https://dmitrydzz.github.io/calculator-comrade/screenshots/display_512x250.png)
+![Calculator Comrade Library](https://calculator-comrade.github.io/calculator-comrade/screenshots/display_512x250.png)
 
 This C++ library emulates a pocket calculator's microprocessor. It implements basic arithmetic operations (+, –, ×, ÷, %, √, MU, ±) and basic memory operations (M+, M-, MR, MC).
 
 The emulator doesn't implement BCD encoding (binary-coded decimals) since it was designed for 8-bit microprocessors and higher. However, in all other aspects, the architecture and algorithms were scrupulously reproduced.
 
-The library was used in [Calculator Comrade](https://dmitrydzz.github.io/calculator-comrade/) Android app. The app is free, and you can get it on Google Play.
+The library was used in [Calculator Comrade](https://calculator-comrade.github.io/calculator-comrade/) Android app. The app is free, and you can get it on Google Play.
 
 [![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=ru.robotmitya.comrade)
 
@@ -79,7 +79,7 @@ sudo apt install cmake ninja-build clang git
 The project uses GoogleTest as a Git submodule, so clone the repository with submodules:
 
 ```bash
-git clone --recurse-submodules https://github.com/DmitryDzz/calculator-comrade-lib.git
+git clone --recurse-submodules https://github.com/calculator-comrade/calculator-comrade-lib.git
 cd calculator-comrade-lib
 ```
 
