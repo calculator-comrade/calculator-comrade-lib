@@ -27,6 +27,7 @@ target_link_options(calculator_wasm
         "SHELL:--no-entry"
 
         "SHELL:-s WASM=1"
+        "SHELL:-s MIN_CHROME_VERSION=69"
         "SHELL:-s MODULARIZE=1"
 #        "SHELL:-s EXPORT_ES6=1"
         "SHELL:-s EXPORT_NAME=createCalculatorModule"

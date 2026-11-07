@@ -196,34 +196,24 @@ The test executable is built for Android as part of the regular build. Running i
 
 WebAssembly builds are intended to be performed from a Linux x64 host.
 
-Install Emscripten SDK first:
-
-- Emscripten SDK installation: https://emscripten.org/docs/getting_started/downloads.html
-
-The `EMSDK` environment variable must point to the installed Emscripten SDK directory:
+Use the dedicated build script from the repository root:
 
 ```bash
-export EMSDK=/path/to/emsdk
+./build-wasm.sh
 ```
 
-Before building, make sure the Emscripten environment is activated according to the Emscripten SDK instructions.
+The script installs and activates the Emscripten SDK version specified in
+`emsdk-version.txt` inside the ignored `.tools/emsdk/` directory. It does not
+change the system-wide Emscripten installation or the SDK used by other projects.
+An internet connection is required for the first installation.
 
-Debug build:
+The script configures and builds both `wasm-debug` and `wasm-release` CMake
+presets. Release output is written to `build/wasm-release/wasm/` (`calculator.js`
+and `calculator.wasm`). The WebAssembly build targets Android WebView 69 and newer.
 
-```bash
-cmake --preset wasm-debug
-cmake --build --preset wasm-debug
-```
-
-Release build:
-
-```bash
-cmake --preset wasm-release
-cmake --build --preset wasm-release
-```
-
-The test executable is built for WebAssembly as part of the regular build. Running WebAssembly tests may require an additional runtime setup, such as Node.js or another WASM-compatible test runner.
-
+WebAssembly test binaries are built but not executed by this script. Running
+them may require a separate runtime setup, such as Node.js or another
+WASM-compatible test runner.
 ### Available presets
 
 To list available configure presets:
@@ -271,8 +261,9 @@ These scripts are intended for local validation before pushing changes or prepar
 
 Available scripts:
 
-- `build-on-host-linux-x64.sh` – builds and tests Linux x64, then builds Android arm64, Android armv7, and WebAssembly presets. Android and WebAssembly test binaries are built, but not executed by this script.
+- `build-on-host-linux-x64.sh` – builds and tests Linux x64, then builds Android arm64 and Android armv7 presets. Android test binaries are built but not executed by this script.
+- `build-wasm.sh` – installs the pinned Emscripten SDK locally and builds WebAssembly Debug and Release presets. WebAssembly test binaries are built but not executed.
 - `build-on-host-linux-arm64.sh` – builds and tests Linux arm64 presets. This script is intended for native Linux arm64 hosts, for example Raspberry Pi.
 - `build-on-host-windows-x64.cmd` – builds and tests Windows x64 presets. This script should be run from a terminal where the Visual Studio / MSVC build environment is already initialized, such as Developer PowerShell for VS or Developer Command Prompt for VS.
 
-The scripts are thin wrappers around CMake Presets. They do not replace the individual preset commands described above; they only provide a quicker way to run all relevant builds for the current host.
+The host build scripts use the existing CMake Presets; `build-wasm.sh` additionally manages a project-local Emscripten toolchain to keep the WASM build version stable.

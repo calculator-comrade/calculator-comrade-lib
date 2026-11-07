@@ -15,7 +15,4 @@ for BUILD_TYPE in debug release; do
     cmake --preset "android-armv7-${BUILD_TYPE}"
     cmake --build --preset "android-armv7-${BUILD_TYPE}"
 
-    echo -e "\n========= Target: WebAssembly, BuildType: ${BUILD_TYPE} =========\n"
-    cmake --preset "wasm-${BUILD_TYPE}"
-    cmake --build --preset "wasm-${BUILD_TYPE}"
 done

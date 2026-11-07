@@ -43,3 +43,6 @@ build/
 # Output directory with final .so
 output/
 output.zip
+
+# Project-local toolchains
+.tools/
